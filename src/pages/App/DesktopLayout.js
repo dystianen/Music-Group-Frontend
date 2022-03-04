@@ -14,8 +14,8 @@ import Icon, {
 } from '@ant-design/icons';
 import ProLayout, {PageContainer} from '@ant-design/pro-layout';
 import {AppRoute} from '../../routes/app';
-import {useHistory, useLocation, Link} from 'react-router-dom';
-import icon from '../../assets/icon/sc-logo.png';
+import {useHistory, useLocation} from 'react-router-dom';
+import icon from '../../assets/icon/sc-logo-v3.png';
 import './DesktopLayout.css';
 
 import MenuList from './MenuList';
@@ -48,10 +48,10 @@ export const DesktopLayout = observer(() => {
 
             const sidebarIcon = () => {
                 return (
-                    <div style={styles.logo}>
-                        <Image preview={false} style={{width: "40px", height: "40px"}} src={icon}/>
-                        <Title className={'title-logo'} level={3} strong>SC Groups Music</Title>
-                    </div>
+                    // <div style={styles.logo}>
+                        <Image preview={false} style={{width: "100%", height: "100px"}} src={icon}/>
+                        // {/*<Title className={'title-logo'} level={3} strong>SC Groups Music</Title>*/}
+                    // </div>
                 )
             }
 
@@ -95,8 +95,9 @@ export const DesktopLayout = observer(() => {
                             key={item.path}
                             onClick={() => {
                                 setPathname(item.path);
-                                if (item.path == '/app/revenue') {
-                                    window.open('https://docs.google.com/forms/d/e/1FAIpQLSfqpHhNpWqRln4V-XVTujUAI72rzI5ODvXDljEq8GVOUYPt-Q/closedform')
+                                if (item.path == '/app/music') {
+                                    window.open('https://forms.gle/Lo7tW7MWtat74kjU9');
+                                    // history.push('https://forms.gle/Lo7tW7MWtat74kjU9');
                                 } else {
                                     history.push(item.path);
                                 }

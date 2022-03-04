@@ -27,6 +27,10 @@
     border-right: 2px solid #ff1818 !important;
 }
 
+.ant-pro-sider-logo {
+    display: grid !important;
+}
+
 @media only screen and (max-width: 600px) {
     .title-logo {
         display: none;

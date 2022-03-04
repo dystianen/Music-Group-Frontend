@@ -11,11 +11,11 @@ export const AppRoute = () => {
         <Route path={"/app/admin"}>
             <Index/>
         </Route>
-        <Route path={"/app/revenue"}>
-            <Revenue/>
-        </Route>
+        {/*<Route path={"/app/music"}>*/}
+        {/*    <Revenue/>*/}
+        {/*</Route>*/}
         <Route path="/app" exact>
-            <Redirect to={'/app/home'} />
+            <Redirect to={'/app/admin'} />
         </Route>
     </Switch>
 }
