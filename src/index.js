@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import {Main} from "./Main";
+import enUs from 'antd/lib/locale/en_US';
+import {ConfigProvider} from "antd";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Main />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <ConfigProvider locale={enUs}>
+        <Main/>
+    </ConfigProvider>,
+    document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

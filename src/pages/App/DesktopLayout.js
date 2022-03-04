@@ -1,137 +1,160 @@
-import React, {useState} from "react";
-import {Button, Layout, Menu, PageHeader, Popover, Typography} from "antd";
-import {MenuList} from "./MenuList";
-import {Link} from "react-router-dom";
-import {UserOutlined} from "@ant-design/icons";
-import {AppRoute} from "../../routes/app";
+import React, {useEffect, useState} from 'react';
+import {
+    Menu,
+    Dropdown,
+    Image,
+    Avatar,
+    message,
+    Typography,
+} from 'antd';
+import Icon, {
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    DownOutlined, UserOutlined,
+} from '@ant-design/icons';
+import ProLayout, {PageContainer} from '@ant-design/pro-layout';
+import {AppRoute} from '../../routes/app';
+import {useHistory, useLocation, Link} from 'react-router-dom';
+import icon from '../../assets/icon/sc-logo.png';
+import './DesktopLayout.css';
 
-const {Text, Paragraph} = Typography;
-const {Header, Content, Sider} = Layout;
+import MenuList from './MenuList';
+import {useStore} from "../../utils/useStore";
+import {observer} from "mobx-react-lite";
 
-export const DesktopLayout = () => {
-    const [clicked, setClicked] = useState(false);
+const {Title} = Typography;
 
-    return <Layout
-        theme={"light"}
-        className={"transparent"}
-        hasSider={true}
-        style={{
-            paddingLeft: 0,
-            display: "flex",
-            width: "100vw",
-            height: "100vh",
-        }}>
+export const DesktopLayout = observer(() => {
+            const history = useHistory();
+            const store = useStore();
+            const location = useLocation();
+            const [pathname, setPathname] = useState(location.pathname);
+            const [collapsed, setCollapsed] = useState(false);
 
-        <Sider
-            className={"transparent"}
-            width={240}
-            style={{
-                overflowX: "hidden",
-                bottom: 0,
-                justifyContent: "flex-start",
-                paddingTop: 20,
-                paddingLeft: 20,
-                position: "fixed",
-                top: 0,
-                zIndex: 10,
-            }}
-        >
-            <div style={{
-                paddingLeft: 20,
-                marginBottom: 40,
-            }}>
-                <Paragraph
-                    style={{
-                        margin: 0,
-                        padding: 0,
-                        fontSize: 20,
-                        marginLeft: 5,
-                        fontWeight: 600,
-                        color: "#413d3e",
+            const styles = {
+                logo: {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    wrap: 'wrap',
+                    gap: '0.5em',
+                }
+            }
+
+            const content = (
+                <PageContainer>
+                    <AppRoute/>
+                </PageContainer>
+            );
+
+            const sidebarIcon = () => {
+                return (
+                    <div style={styles.logo}>
+                        <Image preview={false} style={{width: "40px", height: "40px"}} src={icon}/>
+                        <Title className={'title-logo'} level={3} strong>SC Groups Music</Title>
+                    </div>
+                )
+            }
+
+            const menu = (
+                <Menu style={{width: 'auto', backgroundColor: '#ffffff'}}>
+                    <Menu.Item key="0">
+                        {/*<a>{store.authentication.userData?.name}</a>*/}
+                        <span>DJ Cemplek</span>
+                    </Menu.Item>
+                    <Menu.Divider/>
+                    <Menu.Item key="2">
+                        <p onClick={() => {
+                            // store.authentication.logout()
+                            message.success("Successfully logout!")
+                            history.push('/login')
+                        }}> Sign out</p>
+                    </Menu.Item>
+                </Menu>
+            );
+
+            return (
+                <ProLayout
+                    layout={'side'}
+                    route={{
+                        path: MenuList.route.path,
+                        icon: MenuList.route.icon,
+                        routes: MenuList.route.routes.filter(r => {
+                            return r
+                        })
+                    }}
+                    location={{pathname}}
+                    pathname={pathname}
+                    headerHeight={50}
+                    headerTheme={'light'}
+                    navTheme={'light'}
+                    fixSiderbar={true}
+                    collapsed={collapsed}
+                    collapsedButtonRender={false}
+                    menuItemRender={(item, dom) => (
+                        <div
+                            key={item.path}
+                            onClick={() => {
+                                setPathname(item.path);
+                                if (item.path == '/app/revenue') {
+                                    window.open('https://docs.google.com/forms/d/e/1FAIpQLSfqpHhNpWqRln4V-XVTujUAI72rzI5ODvXDljEq8GVOUYPt-Q/closedform')
+                                } else {
+                                    history.push(item.path);
+                                }
+                            }}
+                        >
+                            {dom}
+                        </div>
+                    )}
+                    onCollapse={setCollapsed}
+                    logo={sidebarIcon}
+                    title={''}
+                    pageTitleRender={props => {
+                        const currentRoute = MenuList.title
+
+                        const defaultRouteName = props.pathname.replace(/\//g, ' ').trim();
+
+                        return currentRoute ?? defaultRouteName;
+                    }}
+                    headerContentRender={() => {
+                        return (
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                flexWrap: 'nowrap',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '0 1em 0 0',
+                            }}>
+                                <div
+                                    onClick={() => setCollapsed(!collapsed)}
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        width: '47px',
+                                        height: '45px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    {collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+                                </div>
+
+                                <Dropdown overlay={menu} trigger={['click']}>
+                                    <a className="ant-dropdown-link"
+                                       style={{display: 'flex', alignItems: 'center', color: 'black'}}
+                                       onClick={e => e.preventDefault()}>
+                                        <Avatar style={{backgroundColor: '#87d068'}} icon={<UserOutlined/>}/>
+                                        <span style={{marginLeft: '0.5em'}}>DJ Cemplek</span>
+                                        <DownOutlined style={{ marginLeft: '0.5em' }} />
+                                    </a>
+                                </Dropdown>
+                            </div>
+                        );
                     }}
                 >
-                    Boilerplate
-                </Paragraph>
-            </div>
-            <MenuList closeLeftDrawer={() => {
-            }}/>
-        </Sider>
-
-
-        <Layout style={{
-            paddingLeft: 240
-        }}>
-            <Header
-                theme={"light"}
-                style={{
-                    height: 54,
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                    backgroundColor: "transparent",
-                    maxWidth: 1024,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end'
-                }}
-            >
-                <Popover
-                    autoAdjustOverflow={true}
-                    placement="bottomRight"
-                    content={
-                        <Menu
-                            type={"line"}
-                            inlineIndent={0}
-                            theme="light"
-                            style={{
-                                backgroundColor: "transparent",
-                                borderRightWidth: 0,
-                            }}
-                            mode="inline"
-                        >
-                            <Menu.Item>
-                                <Link to="/app/profile">
-                                    <span>Profile</span>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item
-                                onClick={() => {
-                                    // store.authentication.logout();
-                                    // return history.push("/login");
-                                }}
-                            >
-                                <span>Sign out</span>
-                            </Menu.Item>
-                        </Menu>
-                    }
-                    title={
-                        <Text>
-                            info@bangun-kreatif.com
-                            {/*{store.userData.email}{" "}*/}
-                            <Paragraph style={{fontWeight: 400}} type={"secondary-dark"}>
-                                Administrator
-                                {/*{store.userData.role}*/}
-                            </Paragraph>
-                        </Text>
-                    }
-                    trigger="click"
-                    visible={clicked}
-                    onVisibleChange={() => setClicked(!clicked)}
-                >
-                    <Button
-                        size={"default"}
-                        style={{}}
-                        icon={
-                            <UserOutlined style={{fontSize: "13px"}}/>
-                        }
-                    />
-                </Popover>
-            </Header>
-            <Content style={{
-                maxWidth: 1024,
-                // marginTop: 32,
-            }}>
-                <AppRoute/>
-            </Content>
-        </Layout>
-    </Layout>
-};
+                    {content}
+                </ProLayout>
+            );
+        }
+    )
+;
