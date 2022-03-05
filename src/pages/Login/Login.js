@@ -5,6 +5,8 @@ import {Button, Card, Checkbox, Col, Form, Input, Row, Typography} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {useHistory} from "react-router-dom";
 
+const {Title} = Typography;
+
 export const Login = observer(() => {
     const store = useStore();
     const [loading, setLoading] = useState(false);
@@ -25,36 +27,21 @@ export const Login = observer(() => {
         return history.push("/app/page_example_1");
     };
 
-    return <div style={{width: '100vw', display: 'flex', justifyContent: 'center'}}>
+    return <div style={{height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
         <Row justify={'center'}>
             <Col>
                 <div style={{
                     display: 'flex',
                     justifyContent: 'flex-start',
-                    marginTop: '5vh',
                     flexDirection: 'column',
                     alignItems: 'center',
                 }}>
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'stretch'}}>
-                        <Typography.Paragraph
-                            style={{
-                                margin: 0,
-                                padding: 0,
-                                fontSize: 20,
-                                marginLeft: 5,
-                                fontWeight: 600,
-                                color: "#413d3e",
-                            }}
-                        >
-                            Boilerplate
-                        </Typography.Paragraph>
-                    </div>
                     <Card
                         style={{width: 320, textAlign: 'center'}}
                         headStyle={{fontSize: 13, fontWeight: 200}}
                         className={"shadow"}
                         bordered={true}
-                        title={'Sign in to your account'}
+                        title={<Title level={4} strong>SC Music Group</Title>}
                     >
                         <Form
                             layout={'vertical'}
@@ -89,24 +76,10 @@ export const Login = observer(() => {
                                     placeholder="Password"
                                 />
                             </Form.Item>
-                            <Form.Item
-                                style={{
-                                    marginTop: 0,
-                                    marginBottom: 20,
-                                    padding: 0
-                                }}
-                                // label="Password"
-                                name="forgot-password"
-                                size={'small'}
-                                rules={[{required: false, message: 'Please input your Password!'}]}
-                            >
-                                <a className="login-form-forgot" href="">
-                                    Forgot password
-                                </a>
-                            </Form.Item>
 
                             <Form.Item
                                 style={{
+                                    marginBottom: 5,
                                     marginBottom: 5,
                                     textAlign: 'left'
                                 }}>

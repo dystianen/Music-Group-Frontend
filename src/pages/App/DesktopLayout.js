@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
     Menu,
     Dropdown,
@@ -31,15 +31,6 @@ export const DesktopLayout = observer(() => {
             const [pathname, setPathname] = useState(location.pathname);
             const [collapsed, setCollapsed] = useState(false);
 
-            const styles = {
-                logo: {
-                    display: 'flex',
-                    flexDirection: 'row',
-                    wrap: 'wrap',
-                    gap: '0.5em',
-                }
-            }
-
             const content = (
                 <PageContainer>
                     <AppRoute/>
@@ -47,12 +38,11 @@ export const DesktopLayout = observer(() => {
             );
 
             const sidebarIcon = () => {
-                return (
-                    // <div style={styles.logo}>
-                        <Image preview={false} style={{width: "100%", height: "100px"}} src={icon}/>
-                        // {/*<Title className={'title-logo'} level={3} strong>SC Groups Music</Title>*/}
-                    // </div>
-                )
+                return <Image preview={false} style={{width: "100%", height: "100px"}} src={icon}/>
+            }
+
+            const iconCollapse = () => {
+                return <Image preview={false} style={{width: "100%", height: "26px"}} src={icon}/>
             }
 
             const menu = (
@@ -107,7 +97,7 @@ export const DesktopLayout = observer(() => {
                         </div>
                     )}
                     onCollapse={setCollapsed}
-                    logo={sidebarIcon}
+                    logo={collapsed ? iconCollapse : sidebarIcon}
                     title={''}
                     pageTitleRender={props => {
                         const currentRoute = MenuList.title
