@@ -12,7 +12,7 @@ const MenuList = {
         routes: [
             {
                 name: 'Submit Music',
-                path: '/app/music',
+                path: 'https://forms.gle/Lo7tW7MWtat74kjU9',
                 icon: <FontAwesomeIcon style={{marginRight: '1.2em'}} icon={faMusic} />,
             },
             {
