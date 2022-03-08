@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {observer} from 'mobx-react-lite';
 import {useStore} from "../../utils/useStore";
-import {Button, Card, Checkbox, Col, Form, Input, Row, Typography} from 'antd';
+import {Button, Card, Checkbox, Col, Form, Input, Row, Typography, message} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {useHistory} from "react-router-dom";
 
@@ -9,22 +9,23 @@ const {Title} = Typography;
 
 export const Login = observer(() => {
     const store = useStore();
-    const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm();
 
     let history = useHistory();
 
-    const onFinish = values => {
-        console.log('Received values of form: ', values);
-        enterLoading(values).then(res => {
-            console.log(res, "awasaa");
-        }).catch((error) => {
-            console.log({error}, "awasaa error");
-        });
-    };
+    async function onFinish(values) {
+        try {
+            const body = {
+                email: values.email,
+                password: values.password,
+            }
 
-    const enterLoading = async (props) => {
-        store.setInitialToken("ayayay", "clap");
-        return history.push("/app/page_example_1");
+            console.log({body});
+            await store.authentication.login(body);
+            history.push('/app/admin')
+        } catch (e) {
+            message.error(e);
+        }
     };
 
     return <div style={{height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -47,13 +48,14 @@ export const Login = observer(() => {
                             layout={'vertical'}
                             name="normal_login"
                             className="login-form"
+                            form={form}
                             onFinish={onFinish}
                         >
                             <Form.Item
                                 label="Email"
                                 name="email"
                                 size={'large'}
-                                rules={[{required: false, message: 'Please input your Username!'}]}
+                                rules={[{required: true, message: 'Please input your Username!'}]}
                             >
                                 <Input
                                     prefix={<UserOutlined className="site-form-item-icon"/>}
@@ -68,7 +70,7 @@ export const Login = observer(() => {
                                 label="Password"
                                 name="password"
                                 size={'large'}
-                                rules={[{required: false, message: 'Please input your Password!'}]}
+                                rules={[{required: true, message: 'Please input your Password!'}]}
                             >
                                 <Input.Password
                                     prefix={<LockOutlined className="site-form-item-icon"/>}
@@ -79,7 +81,6 @@ export const Login = observer(() => {
 
                             <Form.Item
                                 style={{
-                                    marginBottom: 5,
                                     marginBottom: 5,
                                     textAlign: 'left'
                                 }}>
@@ -94,10 +95,8 @@ export const Login = observer(() => {
                                 }}>
                                 <Button type="primary"
                                         block
-                                        loading={loading}
                                         htmlType="submit"
                                         size={'large'}
-                                        onSubmit={enterLoading}
                                         className="login-form-button">
                                     Sign In
                                 </Button>
