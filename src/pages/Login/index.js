@@ -21,8 +21,14 @@ export const Login = observer(() => {
             }
 
             console.log({body});
-            await store.authentication.login(body);
-            history.push('/app/admin')
+            const res = await store.authentication.login(body);
+
+            if (res.body.status === 200)     {
+                history.push('/app/admin')
+                localStorage.setItem('access_token', res.body.data.token)
+            } else {
+                message.error(res.body.message)
+            }
         } catch (e) {
             message.error(e);
         }

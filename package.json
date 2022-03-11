@@ -51,6 +51,7 @@
     "mini-css-extract-plugin": "0.11.3",
     "mobx": "^6.1.5",
     "mobx-react-lite": "^3.2.0",
+    "moment": "^2.29.1",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "particles-bg": "^2.5.0",
     "pnp-webpack-plugin": "1.6.4",

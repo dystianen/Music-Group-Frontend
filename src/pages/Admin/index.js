@@ -1,19 +1,36 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Card, Typography, Table, Button, Tag, Modal, Form, Input, Row, Col, Select, message, Spin} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import Icon, {EditOutlined, EyeOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {observer} from "mobx-react-lite";
 import {useStore} from "../../utils/useStore";
+import moment from "moment";
+import {useHistory} from "react-router-dom";
 
 const {Title} = Typography;
 
 export const Admin = observer(() => {
     const store = useStore();
+    const history = useHistory();
     const [form] = Form.useForm();
     const [isModal, setIsModal] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [IDData, setIDData] = useState('');
+    const [dataAdmin, setDataAdmin] = useState([]);
+    const [index, setIndex] = useState(null);
+    const [page, setPage] = useState(1);
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    const fetchData = async () => {
+        const res = await store.admin.getAll();
+
+        setDataAdmin(res.body.data.admin);
+        console.log({res})
+    }
 
     const styles = {
         actionFooter: {
@@ -36,25 +53,61 @@ export const Admin = observer(() => {
         }
     };
 
+    const setEditValue = (data) => {
+        console.log({data})
+        form.setFieldsValue({
+            email: data.email,
+            firstname: data.firstname,
+            lastname: data.lastname,
+            bank_name: data.bank_name,
+            bank_account_number: data.bank_account_number,
+            bank_account_holder_name: data.bank_account_holder_name,
+            amount: data.amount,
+            phone_number: data.phone_number,
+            status: data.status,
+        })
+    }
+
     async function onSubmit(data) {
         try {
             setIsLoading(true);
             const body = {
-                artistName: data.artist,
+                artistName: localStorage.getItem('username'),
                 email: data.email,
                 firstName: data.firstname,
                 lastName: data.lastname,
                 bankName: data.bank_name,
-                accountNumber: data.bank_account_no,
+                accountNumber: data.bank_account_number,
                 accountName: data.bank_account_holder_name,
+                amount: data.amount,
                 phone: data.phone_number,
                 status: data.status,
             };
 
             if (isEdit) {
-                await store.admin.update(IDData, body);
+                const res = await store.admin.update(IDData, body);
+
+                if (res.body.status == 200) {
+                    fetchData()
+                    setIsModal(false);
+                    setIsEdit(false);
+                    form.resetFields();
+                    message.success(res.body.message);
+                } else {
+                    message.error(res.body.message);
+                }
             } else {
-                await store.admin.create(body);
+                const res = await store.admin.create(body);
+
+                if (res.body.status == 200) {
+                    fetchData()
+                    setIsModal(false);
+                    setIsEdit(false);
+                    form.resetFields();
+                    message.success(res.body.message);
+                } else {
+                    message.error(res.body.message);
+                }
             }
 
             setIsLoading(false);
@@ -100,7 +153,7 @@ export const Admin = observer(() => {
             >
                 <Form form={form} layout={'vertical'}>
                     <Form.Item name={'artist'} label={'Artist Name'}>
-                        <Input disabled defaultValue={'DJ Cemplek'}/>
+                        <Input disabled defaultValue={localStorage.getItem('username')}/>
                     </Form.Item>
                     <Form.Item
                         name={'email'}
@@ -161,7 +214,7 @@ export const Admin = observer(() => {
                         </Col>
                         <Col>
                             <Form.Item
-                                name={'bank_account_no'}
+                                name={'bank_account_number'}
                                 label={'Bank Account Number'}
                                 rules={[
                                     {
@@ -187,7 +240,19 @@ export const Admin = observer(() => {
                         <Input placeholder={'Input bank account holder name'}/>
                     </Form.Item>
                     <Form.Item
-                        name={'phone'}
+                        name={'amount'}
+                        label={'Amount'}
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input amount!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder={'Input amount'}/>
+                    </Form.Item>
+                    <Form.Item
+                        name={'phone_number'}
                         label={'Phone Number'}
                         rules={[
                             {
@@ -231,6 +296,7 @@ export const Admin = observer(() => {
             cancelText: 'Cancel',
             onOk() {
                 store.admin.delete(id);
+                fetchData()
             }
         });
     };
@@ -238,13 +304,15 @@ export const Admin = observer(() => {
     const columns = [
         {
             title: 'No. ',
-            key: 'no',
-            dataIndex: 'no',
+            key: index,
+            dataIndex: index,
+            render: (t, r, index) => `${(page - 1) * 10 + index + 1}`,
         },
         {
             title: 'Date',
-            key: 'date',
-            dataIndex: 'date',
+            key: 'created_at',
+            dataIndex: 'created_at',
+            render: (record) => moment(record).format('DD MMM YYYY HH:mm')
         },
         {
             title: 'Amount',
@@ -272,12 +340,16 @@ export const Admin = observer(() => {
                             setIDData(record.id);
                             setIsEdit(true);
                             setIsModal(true);
+                            setEditValue(record);
                         }}
                     />
                     <Button
                         type='link'
                         icon={<EyeOutlined/>}
                         style={{color: '#000000'}}
+                        onClick={() => {
+                            history.push(`/app/detail/${record.id}`)
+                        }}
                     />
                     <Button
                         type='link'
@@ -292,86 +364,6 @@ export const Admin = observer(() => {
         },
     ];
 
-    const dataSource = [
-        {
-            key: 1,
-            no: 1,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'transferred',
-        },
-        {
-            key: 2,
-            no: 2,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'not_available',
-        },
-        {
-            key: 3,
-            no: 3,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'transferred',
-        },
-        {
-            key: 4,
-            no: 4,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'transferred',
-        },
-        {
-            key: 5,
-            no: 5,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'transferred',
-        },
-        {
-            key: 6,
-            no: 6,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'not_available',
-        },
-        {
-            key: 7,
-            no: 7,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'not_available',
-        },
-        {
-            key: 8,
-            no: 8,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'transferred',
-        },
-        {
-            key: 9,
-            no: 9,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'not_available',
-        },
-        {
-            key: 10,
-            no: 10,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'not_available',
-        },
-        {
-            key: 11,
-            no: 11,
-            date: '26/02/2022 12:21',
-            amount: 'Rp. 25000',
-            status: 'transferred',
-        },
-    ];
-
     return (
         <Card
             title={<Title level={4} strong>Admin</Title>}
@@ -383,7 +375,7 @@ export const Admin = observer(() => {
         >
             {modalAddRevenue()}
             <Spin spinning={isLoading}>
-                <Table columns={columns} dataSource={dataSource} scroll={{x: 'max-content', y: 400}}/>
+                <Table columns={columns} dataSource={dataAdmin?.map(it => it)} scroll={{x: 'max-content', y: 400}}/>
             </Spin>
         </Card>
     );

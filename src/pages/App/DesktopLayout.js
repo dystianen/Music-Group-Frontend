@@ -37,19 +37,17 @@ export const DesktopLayout = observer(() => {
   const menu = (
     <Menu style={{ width: 'auto', backgroundColor: '#ffffff' }}>
       <Menu.Item key='0'>
-        {/*<a>{store.authentication.userData?.name}</a>*/}
-        <span>DJ Cemplek</span>
+        <span>{localStorage.getItem('username')}</span>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key='2'>
         <p
-          onClick={() => {
-            // store.authentication.logout()
+          onClick={async () => {
+            await store.authentication.logout()
             message.success('Successfully logout!');
             history.push('/login');
           }}
         >
-          {' '}
           Sign out
         </p>
       </Menu.Item>
@@ -124,7 +122,7 @@ export const DesktopLayout = observer(() => {
             <Dropdown overlay={menu} trigger={['click']}>
               <a className='ant-dropdown-link' style={{ display: 'flex', alignItems: 'center', color: 'black' }} onClick={(e) => e.preventDefault()}>
                 <Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
-                <span style={{ marginLeft: '0.5em' }}>DJ Cemplek</span>
+                <span style={{ marginLeft: '0.5em' }}>{localStorage.getItem('username')}</span>
                 <DownOutlined style={{ marginLeft: '0.5em' }} />
               </a>
             </Dropdown>
