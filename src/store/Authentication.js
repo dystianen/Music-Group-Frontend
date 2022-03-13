@@ -1,11 +1,18 @@
 import {http} from "../utils/http";
 
 export class Authentication {
-    username = [];
+
+    constructor(context) {
+        this.context = context;
+    }
 
     async login(data) {
-        const res = await http.post('/api/login').send(data);
-        localStorage.setItem('username', res.body.data?.user?.name);
+        const res = await http.post('/auth/login').send(data);
+        return res;
+    }
+
+    async register(data) {
+        const res = await http.post('/auth/register').send(data);
         return res;
     }
 

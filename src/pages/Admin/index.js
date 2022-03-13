@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Card, Typography, Table, Button, Tag, Modal, Form, Input, Row, Col, Select, message, Spin} from 'antd';
-import {PlusOutlined} from '@ant-design/icons';
-import Icon, {EditOutlined, EyeOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
-import {observer} from "mobx-react-lite";
-import {useStore} from "../../utils/useStore";
+import React, { useEffect, useState } from 'react';
+import { Card, Typography, Table, Button, Tag, Modal, Form, Input, Row, Col, Select, message, Spin } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import Icon, { EditOutlined, EyeOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { observer } from "mobx-react-lite";
+import { useStore } from "../../utils/useStore";
 import moment from "moment";
-import {useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 export const Admin = observer(() => {
     const store = useStore();
@@ -28,8 +28,8 @@ export const Admin = observer(() => {
     const fetchData = async () => {
         const res = await store.admin.getAll();
 
-        setDataAdmin(res.body.data.admin);
-        console.log({res})
+        setDataAdmin(res.body);
+        console.log({ res })
     }
 
     const styles = {
@@ -44,9 +44,9 @@ export const Admin = observer(() => {
 
     const statusValues = (record) => {
         switch (record || '') {
-            case 'transferred':
+            case true:
                 return <Tag color={'green'}>Transferred</Tag>;
-            case 'not_available':
+            case false:
                 return <Tag color={'red'}>Not Available</Tag>;
             default:
                 return record;
@@ -54,16 +54,16 @@ export const Admin = observer(() => {
     };
 
     const setEditValue = (data) => {
-        console.log({data})
+        console.log({ data })
         form.setFieldsValue({
             email: data.email,
-            firstname: data.firstname,
-            lastname: data.lastname,
-            bank_name: data.bank_name,
-            bank_account_number: data.bank_account_number,
-            bank_account_holder_name: data.bank_account_holder_name,
+            firstname: data.firstName,
+            lastname: data.lastName,
+            bank_name: data.bankName,
+            bank_account_number: data.accountNumber,
+            bank_account_holder_name: data.accountName,
             amount: data.amount,
-            phone_number: data.phone_number,
+            phone_number: data.phone,
             status: data.status,
         })
     }
@@ -87,19 +87,21 @@ export const Admin = observer(() => {
             if (isEdit) {
                 const res = await store.admin.update(IDData, body);
 
-                if (res.body.status == 200) {
+                if (res.body.statusCode == 200) {
                     fetchData()
                     setIsModal(false);
                     setIsEdit(false);
                     form.resetFields();
-                    message.success(res.body.message);
+                    message.success('Updated successfully');
                 } else {
-                    message.error(res.body.message);
+                    message.error('failed to update');
                 }
             } else {
                 const res = await store.admin.create(body);
 
-                if (res.body.status == 200) {
+                console.log({ res })
+
+                if (res.body.statusCode == 201) {
                     fetchData()
                     setIsModal(false);
                     setIsEdit(false);
@@ -153,7 +155,7 @@ export const Admin = observer(() => {
             >
                 <Form form={form} layout={'vertical'}>
                     <Form.Item name={'artist'} label={'Artist Name'}>
-                        <Input disabled defaultValue={localStorage.getItem('username')}/>
+                        <Input disabled defaultValue={localStorage.getItem('username')} />
                     </Form.Item>
                     <Form.Item
                         name={'email'}
@@ -165,68 +167,56 @@ export const Admin = observer(() => {
                             },
                         ]}
                     >
-                        <Input placeholder={'Input email'}/>
+                        <Input placeholder={'Input email'} />
                     </Form.Item>
-                    <Row gutter={24}>
-                        <Col>
-                            <Form.Item
-                                name={'firstname'}
-                                label={'First Name'}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input firstname!',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder={'Input firstname'}/>
-                            </Form.Item>
-                        </Col>
-                        <Col>
-                            <Form.Item
-                                name={'lastname'}
-                                label={'Last Name'}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input lastname!',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder={'Input lastname'}/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col>
-                            <Form.Item
-                                name={'bank_name'}
-                                label={'Bank Name'}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input bank name!',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder={'Input bank name'}/>
-                            </Form.Item>
-                        </Col>
-                        <Col>
-                            <Form.Item
-                                name={'bank_account_number'}
-                                label={'Bank Account Number'}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input bank account number!',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder={'Input bank account number'}/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
+                    <Form.Item
+                        name={'firstname'}
+                        label={'First Name'}
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input firstname!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder={'Input firstname'} />
+                    </Form.Item>
+                    <Form.Item
+                        name={'lastname'}
+                        label={'Last Name'}
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input lastname!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder={'Input lastname'} />
+                    </Form.Item>
+                    <Form.Item
+                        name={'bank_name'}
+                        label={'Bank Name'}
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input bank name!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder={'Input bank name'} />
+                    </Form.Item>
+                    <Form.Item
+                        name={'bank_account_number'}
+                        label={'Bank Account Number'}
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input bank account number!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder={'Input bank account number'} />
+                    </Form.Item>
                     <Form.Item
                         name={'bank_account_holder_name'}
                         label={'Bank Account Holder Name'}
@@ -237,7 +227,7 @@ export const Admin = observer(() => {
                             },
                         ]}
                     >
-                        <Input placeholder={'Input bank account holder name'}/>
+                        <Input placeholder={'Input bank account holder name'} />
                     </Form.Item>
                     <Form.Item
                         name={'amount'}
@@ -249,7 +239,7 @@ export const Admin = observer(() => {
                             },
                         ]}
                     >
-                        <Input placeholder={'Input amount'}/>
+                        <Input placeholder={'Input amount'} />
                     </Form.Item>
                     <Form.Item
                         name={'phone_number'}
@@ -261,7 +251,7 @@ export const Admin = observer(() => {
                             },
                         ]}
                     >
-                        <Input placeholder={'Input phone number'}/>
+                        <Input placeholder={'Input phone number'} />
                     </Form.Item>
                     <Form.Item
                         name={'status'}
@@ -274,10 +264,10 @@ export const Admin = observer(() => {
                         ]}
                     >
                         <Select placeholder={'Select status transfer'}>
-                            <Select.Option key='transferred' value={'transferred'}>
+                            <Select.Option key='transferred' value={true}>
                                 Transferred
                             </Select.Option>
-                            <Select.Option key='not_available' value={'not_available'}>
+                            <Select.Option key='not_available' value={false}>
                                 Not Available
                             </Select.Option>
                         </Select>
@@ -290,7 +280,7 @@ export const Admin = observer(() => {
     const modalDelete = (id) => {
         Modal.confirm({
             title: 'Hapus Transaksi',
-            icon: <ExclamationCircleOutlined/>,
+            icon: <ExclamationCircleOutlined />,
             content: 'Apakah anda yakin ingin mengahapus data transaksi ini?',
             okText: 'Oke',
             cancelText: 'Cancel',
@@ -331,11 +321,11 @@ export const Admin = observer(() => {
             width: 120,
             align: 'center',
             render: (record) => (
-                <div style={{display: 'flex', gap: '1em', justifyContent: 'center'}}>
+                <div style={{ display: 'flex', gap: '1em', justifyContent: 'center' }}>
                     <Button
                         type='link'
-                        icon={<EditOutlined/>}
-                        style={{color: '#000000'}}
+                        icon={<EditOutlined />}
+                        style={{ color: '#000000' }}
                         onClick={() => {
                             setIDData(record.id);
                             setIsEdit(true);
@@ -345,16 +335,16 @@ export const Admin = observer(() => {
                     />
                     <Button
                         type='link'
-                        icon={<EyeOutlined/>}
-                        style={{color: '#000000'}}
+                        icon={<EyeOutlined />}
+                        style={{ color: '#000000' }}
                         onClick={() => {
                             history.push(`/app/detail/${record.id}`)
                         }}
                     />
                     <Button
                         type='link'
-                        icon={<DeleteOutlined/>}
-                        style={{color: '#000000'}}
+                        icon={<DeleteOutlined />}
+                        style={{ color: '#000000' }}
                         onClick={() => {
                             modalDelete(record.id);
                         }}
@@ -368,14 +358,25 @@ export const Admin = observer(() => {
         <Card
             title={<Title level={4} strong>Admin</Title>}
             extra={
-                <Button type={'primary'} icon={<PlusOutlined/>} onClick={() => setIsModal(true)}>
+                <Button type={'primary'} icon={<PlusOutlined />} onClick={() => setIsModal(true)}>
                     Add Revenue
                 </Button>
             }
         >
             {modalAddRevenue()}
             <Spin spinning={isLoading}>
-                <Table columns={columns} dataSource={dataAdmin?.map(it => it)} scroll={{x: 'max-content', y: 400}}/>
+                <Table
+                    columns={columns}
+                    dataSource={dataAdmin?.data?.map(it => it)}
+                    scroll={{ x: 'max-content', y: 400 }} 
+                    pagination={{
+                        total: dataAdmin.count,
+                        onChange(current) {
+                            setPage(current);
+                        },
+                    }}
+
+                    />
             </Spin>
         </Card>
     );
